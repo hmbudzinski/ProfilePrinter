@@ -3,6 +3,7 @@
 const fs = require("fs");
 const axios = require("axios");
 const inquirer = require("inquirer");
+const html = require("./generateHTML.js");
 // const phantom = require("phantom");
 
 let name;
@@ -16,53 +17,82 @@ let following;
 let followers;
 let color;
 
-//caitlins code
+const userMenu = () => {
+inquirer.prompt([
+  {
+    type: "list",
+    message: "What is your favorite color?",
+    name: "color",
+    choices: ["green", "blue", "pink", "red"]
+  },
+  {
+    type: "input",
+    message: "What is your GitHub username?",
+    name: "username"
+  }
+]).then(function({ username }) {
+
+    console.log(response);
+    color = response.color;
+    github = response.username; 
+
+    getuser(github);
+    });
+};
+
+let htmlTemplate = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+    body{
+        background-color: ${color}
+    }
+    </style>
+</head>
+<body>
+    <p>Name: ${name}</p>
+    <p>Currently at: ${company}</p>
+    <a href="#">Location: ${location}</a>
+    <a href="#">Github: ${github}</a>
+    <a href="#">Blog: ${blog}</a>
+    <p>Job description</p>
+    <p>Public Repositories</p>
+        <p># of repos: ${repos}</p>
+    <p>Followers</p>
+        <p># of followers: ${followers}</p>
+    <p>Github Stars</p>
+        <p># of stars: ${stars}</p>
+    <p>Following</p>
+        <p># of following: ${following}</p>
+</body>
+</html>`
+
+// go to api github (gather all the info)
 function getuser(github) {
     axios.get(`https://api.github.com/users/${github}`)
     .then(function(profile) {
-        console.log(profile,profile.data.name);
+        console.log(profile, profile.data.name);
         let html = generateHTML(profile)
         console.log(html)
+        console.log(res.data);
+        console.log(`Saved ${repoNames.length} repos`)
         // convert to pdf
     })
+}
 
-const userMenu = () => {
-inquirer.prompt([
-    // {
-    //     message: `What is your favorite color?`,
-    //     name: "answer"
-    // },
-    {
-        message: "Enter your GitHub username:",
-        name: "username"
-    }
-])
-  //once response comes back, then push it to a PDF 
-  .then(function({ username }) {
-    // const queryUrl = `https://api.github.com/users/${username}/repos?per_page=100`;
-    const queryUrl = `https://api.github.com/users/${github}`;
-
-    axios.get(queryUrl).then(function(res) {
-      const repoNames = res.data.map(function(repo) {
-        return repo.name;
-      });
-
-      const repoNamesStr = repoNames.join("\n");
-
-    //   fs.writeFile("printed.txt", repoNamesStr, function(err) {
-    //     if (err) {
-    //       throw err;
-    //     }
-        //need username 
-        //image
-        //number of followers
-        //github stars
-        //number of users following 
-        // console.log(res.data);
-        console.log(`Saved ${repoNames.length} repos`);
-      });
-    });
-//   });
+function generateHTML(profile) {
+    name=profile.data.name
+    company=profile.data.company
+    location=profile.data.location
+    blog=profile.data.blog
+    repos=profile.data.public_repos
+    following=profile.data.following
+    followers=profile.data.followers
+    return (htmlTemplate)
 };
 
-// userMenu()
+userMenu();
