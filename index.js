@@ -2,31 +2,9 @@
 const fs = require("fs");
 const axios = require("axios");
 const inquirer = require("inquirer");
-// const pdf = require("html-pdf");
-// var html = fs.readFileSync('./printed.txt', 'utf8');
-
-// const genhtml = require("./generateHTML");
-// const options = { format: 'Letter'};
-// let htmlTemplate;
-
-// let github;
-// let stars;
-// let color;
-// let name;
-// let company;
-// let location;
-// let blog;
-// let repos;
-// let following;
-// let followers;
-// let name= response.data.name;
-// let company= response.data.company;
-// let location= response.data.location;
-// let blog= response.data.blog;
-// let repos= response.data.public_repos;
-// let following= response.data.following;
-// let followers= response.data.followers;
-
+const pdf = require("html-pdf");
+var html = fs.readFileSync('./index1.html', 'utf8');
+const options = { format: 'Letter'};
 
 const colors = {
     green: {
@@ -74,7 +52,7 @@ inquirer.prompt([
     color = response.color;
     github = response.username; 
 
-    getuser(github);
+    getuser(github, color);
     });
 };
 
@@ -84,68 +62,20 @@ function getuser(github, color) {
     axios.get(`https://api.github.com/users/${github}`)
     .then(function(response) {
         profileResponse = generateHTML({...response.data, ...{color}});
-        console.log(response, response.data.name);
-        let htmlProfile = profileInfo(response, html);
-        console.log(htmlProfile);
+        console.log(response.data.color);
     fs.writeFileSync("index1.html", profileResponse, function(err) {
-    console.log("3");
         if (err) throw err;
     })
+    createPDF();
 })
 };
 
-// function profileInfo(github, color) {
-
-// name= response.data.name;
-// company= response.data.company;
-// location= response.data.location;
-// blog= response.data.blog;
-// repos= response.data.public_repos;
-// following= response.data.following;
-// followers= response.data.followers;
-
-//     htmlTemplate = 
-//     `<!DOCTYPE html>
-//         <html lang="en">
-//         <head>
-//         <meta charset="UTF-8">
-//         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-//         <meta http-equiv="X-UA-Compatible" content="ie=edge">
-//     <title>Document</title>
-//     <style>
-//     body{
-//         background-color: ${color}
-//     }
-//     </style>
-// </head>
-// <body>
-//     <p>Name: ${name}</p>
-//     <p>Currently at: ${company}</p>
-//     <a href="#">Location: ${location}</a>
-//     <a href="#">Github: ${github}</a>
-//     <a href="#">Blog: ${blog}</a>
-//     <p>Public Repositories</p>
-//         <p># of repos: ${repos}</p>
-//     <p>Followers</p>
-//         <p># of followers: ${followers}</p>
-//     <p>Github Stars</p>
-//         <p># of stars: ${stars}</p>
-//     <p>Following</p>
-//         <p># of following: ${following}</p>
-// </body>
-// </html>`
-
-//     return (htmlTemplate)
-// };
-
-// fs.writeFile("printed.html", generateHTML, function(err) {
-//     if (err) throw err
-// });
-
-// pdf.create(htmlTemplate, options).toFile('printed.txt', function(err, res) {
-//     if (err) return console.log(err);
-//     console.log(res);
-// })
+function createPDF(){
+  pdf.create(html, options).toFile('./index1.pdf', function(err, res) {
+  if (err) return console.log(err);
+  console.log(res);
+});
+};
 
 // pdf.create(html).toFile([filepath, ], function(err, res){
 //   console.log(res.filename);
@@ -161,8 +91,6 @@ function getuser(github, color) {
  
 // pdf.create(html [, options], function(err, buffer){});
 
-userMenu();    
-
 //NOTES     from natalia
 //to create an html file if you are not usig the starter code
 //call premade function generateHTML and pass the data into it
@@ -173,7 +101,8 @@ userMenu();
 //fs.writeFileSynch("profile.html"), htmlRendered);
 //run node starter
   
-  function generateHTML(data) {
+function generateHTML(data) {
+  console.log("latest", data);
     return `<!DOCTYPE html>
         <html lang="en">
       <head>
@@ -355,7 +284,7 @@ userMenu();
                 <div class="col">
                   <div class="card">
                     <h3>Followers</h3>
-                    <h4>${data.followers}</h4>
+                    <h4>${data.followers_url}</h4>
                   </div>
                </div>
                </div>
@@ -369,7 +298,7 @@ userMenu();
                 <div class="col">
                 <div class="card">
                   <h3>Following</h3>
-                  <h4>${data.following}</h4>
+                  <h4>${data.following_url}</h4>
                   </div>
                </div>
                </div>
@@ -379,4 +308,6 @@ userMenu();
    </body>
 </html>`
 
-          }
+}
+
+userMenu();    
