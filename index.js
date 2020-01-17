@@ -67,6 +67,7 @@ function getuser(github, color) {
         if (err) throw err;
     })
     createPDF();
+    callStars();
 })
 };
 
@@ -76,30 +77,6 @@ function createPDF(){
   console.log(res);
 });
 };
-
-// pdf.create(html).toFile([filepath, ], function(err, res){
-//   console.log(res.filename);
-// });
- 
-// pdf.create(html).toStream(function(err, stream){
-//   stream.pipe(fs.createWriteStream('./foo.pdf'));
-// });
- 
-// pdf.create(html).toBuffer(function(err, buffer){
-//   console.log('This is a buffer:', Buffer.isBuffer(buffer));
-// });
- 
-// pdf.create(html [, options], function(err, buffer){});
-
-//NOTES     from natalia
-//to create an html file if you are not usig the starter code
-//call premade function generateHTML and pass the data into it
-//const htmlRefered = ejs.render(htmlContent, {
-//     filename: "main.ejs";
-//      data: { name: "John Doe", age: 36, hello: "HElloo"}
-// });
-//fs.writeFileSynch("profile.html"), htmlRendered);
-//run node starter
   
 function generateHTML(data) {
   console.log("latest", data);
@@ -256,35 +233,35 @@ function generateHTML(data) {
 <body>
       <div class="wrapper">
          <div class="photo-header">
-            <img src="${data}" alt="Photo of ${data}" />
+            <img src="${data.avatar_url}" alt="Photo of ${data.name}" />
             <h1>Hi!</h1>
             <h2>
             My name is ${data.name}!</h1>
-            <h5>${data}</h5>
+            <h5>${data.company}</h5>
             <nav class="links-nav">
-               <a class="nav-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/place/${data}"><i class="fas fa-location-arrow"></i> ${data}</a>
-               <a class="nav-link" target="_blank" rel="noopener noreferrer" href="${data}"><i class="fab fa-github-alt"></i> GitHub</a>
-              <a class="nav-link" target="_blank" rel="noopener noreferrer" href="${data}"><i class="fas fa-rss"></i> Blog</a>
+               <a class="nav-link" target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/place/${data.location}"><i class="fas fa-location-arrow"></i> ${data.location}</a>
+               <a class="nav-link" target="_blank" rel="noopener noreferrer" href="${data.html_url}"><i class="fab fa-github-alt"></i> GitHub</a>
+              <a class="nav-link" target="_blank" rel="noopener noreferrer" href="${data.blog}"><i class="fas fa-rss"></i> Blog</a>
             </nav>
          </div>
          <main>
             <div class="container">
             <div class="row">
                <div class="col">
-                  <h3>${data}</h3>
+                  <h3>${data.bio}</h3>
                </div>
             </div>
                <div class="row">
                 <div class="col">
                     <div class="card">
                       <h3>Public Repositories</h3>
-                      <h4>${data.repos}</h4>
+                      <h4>${data.public_repos}</h4>
                     </div>
                 </div>
                 <div class="col">
                   <div class="card">
                     <h3>Followers</h3>
-                    <h4>${data.followers_url}</h4>
+                    <h4>${data.followers}</h4>
                   </div>
                </div>
                </div>
@@ -298,7 +275,7 @@ function generateHTML(data) {
                 <div class="col">
                 <div class="card">
                   <h3>Following</h3>
-                  <h4>${data.following_url}</h4>
+                  <h4>${data.following}</h4>
                   </div>
                </div>
                </div>
@@ -309,5 +286,17 @@ function generateHTML(data) {
 </html>`
 
 }
+
+function callStars(github){
+  return axios.get(`https://api.github.com/users/${github}/repos?client_id=${process.env.CLIENT_ID}&client_secret=${process.env.CLIENT_SECRET}&per_page=100`) 
+  .then(response => {      
+    return response.data.reduce((acc, curr) => {          
+    acc += curr.stargazers_count;          
+    console.log("FOR THE STARS", response.data);     
+  return acc;   
+  }, 0);      
+});
+}
+
 
 userMenu();    
