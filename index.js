@@ -33,7 +33,6 @@ const colors = {
   };
 
 function userMenu(){
-console.log("1");
 inquirer.prompt([
   {
     type: "list",
@@ -56,23 +55,19 @@ inquirer.prompt([
 };
 
 function getuser(github, color) {
-  console.log("2");
     // let profileResponse;
     axios.get(`https://api.github.com/users/${github}`)
     .then(function(response) {
         // profileResponse = generateHTML({...response.data, ...{color}});
-        console.log("3");
     fs.writeFileSync("index1.html", generateHTML({...response.data, ...{color}}), function(err) {
       if (err) throw err;
     });
-    console.log("4");
     createPDF();
     // callStars();
 })
 };
 
 function createPDF(){
-  console.log("5");
   var html = fs.readFileSync('./index1.html', 'utf8');
   pdf.create(html, options).toFile('./index1.pdf', function(err, res) {
   if (err) return console.log(err);
