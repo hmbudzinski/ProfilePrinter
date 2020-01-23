@@ -1,9 +1,8 @@
-//inquirer uses promises and waits until the call is ready and then does the action
 const fs = require("fs");
 const axios = require("axios");
 const inquirer = require("inquirer");
 const pdf = require("html-pdf");
-var html = fs.readFileSync('./index1.html', 'utf8');
+// var html = fs.readFileSync('./index1.html', 'utf8');
 const options = { format: 'Letter'};
 
 const colors = {
@@ -11,7 +10,7 @@ const colors = {
       wrapperBackground: "#E6E1C3",
       headerBackground: "#C1C72C",
       headerColor: "black",
-      photoBorderColor: "#black"
+      photoBorderColor: "black"
     },
     blue: {
       wrapperBackground: "#5F64D3",
@@ -33,7 +32,8 @@ const colors = {
     }
   };
 
-let userMenu = () => {
+function userMenu(){
+console.log("1");
 inquirer.prompt([
   {
     type: "list",
@@ -48,7 +48,6 @@ inquirer.prompt([
   }
 ]).then(function(response) {
 
-    console.log(response);
     color = response.color;
     github = response.username; 
 
@@ -56,22 +55,25 @@ inquirer.prompt([
     });
 };
 
-// go to api github
 function getuser(github, color) {
-    let profileResponse;
+  console.log("2");
+    // let profileResponse;
     axios.get(`https://api.github.com/users/${github}`)
     .then(function(response) {
-        profileResponse = generateHTML({...response.data, ...{color}});
-        console.log(response.data.color);
-    fs.writeFileSync("index1.html", profileResponse, function(err) {
-        if (err) throw err;
-    })
+        // profileResponse = generateHTML({...response.data, ...{color}});
+        console.log("3");
+    fs.writeFileSync("index1.html", generateHTML({...response.data, ...{color}}), function(err) {
+      if (err) throw err;
+    });
+    console.log("4");
     createPDF();
-    callStars();
+    // callStars();
 })
 };
 
 function createPDF(){
+  console.log("5");
+  var html = fs.readFileSync('./index1.html', 'utf8');
   pdf.create(html, options).toFile('./index1.pdf', function(err, res) {
   if (err) return console.log(err);
   console.log(res);
@@ -79,7 +81,6 @@ function createPDF(){
 };
   
 function generateHTML(data) {
-  console.log("latest", data);
     return `<!DOCTYPE html>
         <html lang="en">
       <head>
@@ -287,16 +288,15 @@ function generateHTML(data) {
 
 }
 
-function callStars(github){
-  return axios.get(`https://api.github.com/users/${github}/repos?client_id=${process.env.CLIENT_ID}&client_secret=${process.env.CLIENT_SECRET}&per_page=100`) 
-  .then(response => {      
-    return response.data.reduce((acc, curr) => {          
-    acc += curr.stargazers_count;          
-    console.log("FOR THE STARS", response.data);     
-  return acc;   
-  }, 0);      
-});
-}
-
+// function callStars(github){
+//   return axios.get(`https://api.github.com/users/${github}/repos?client_id=${process.env.CLIENT_ID}&client_secret=${process.env.CLIENT_SECRET}&per_page=100`) 
+//   .then(response => {      
+//     return response.data.reduce((acc, curr) => {          
+//     acc += curr.stargazers_count;          
+//     console.log("FOR THE STARS", response.data);     
+//   return acc;   
+//   }, 0);      
+// });
+// }
 
 userMenu();    
